@@ -47,6 +47,8 @@ using NGrams, Test
         @testset "MLE" begin
             lm = train_lm(corpus, 2, MLE())
 
+            @test NGrams.count(lm, "<unk>") == 0
+            @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
             @test NGrams.count(lm, "i") == 4
             @test NGrams.count(lm, ["i", "don't"]) == 2
             @test NGrams.p(lm, ["i"], "don't") == 0.5
