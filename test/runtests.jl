@@ -24,6 +24,10 @@ using NGrams, Test
         @test collect(grams) == [("*BOS*","*BOS*","hello"),
                                  ("*BOS*","hello","there"),
                                  ("hello","there","*EOS*")]
+
+        for n in 1:3
+            @test collect(ngrams(n, corpus)) == collect(ngrams(corpus, n))
+        end
     end
 
 end

@@ -27,7 +27,6 @@ end
 
 collect(ngrams::NGramIterator) = [gram for gram in ngrams]
 
-eltype(::Type{NGramIterator{N,T}}) where {N,T} = NGram{N,T}
 eltype(::NGramIterator{N,T}) where {N,T} = NGram{N,T}
 
 function iterate(ngrams::NGramIterator, state=1)
