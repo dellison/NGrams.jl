@@ -11,7 +11,8 @@ Create a language model with n-gram length `n` and probability model `model`.
 LanguageModel(n::Int, model; bos=BOS, eos=EOS) =
     LanguageModel(NGramCounter(n; bos=bos, eos=eos), model)
 
-count(lm::LanguageModel, tokens) = count(lm.counts, tokens)
+count(lm::LanguageModel, token) = count(lm.counts, [token])
+count(lm::LanguageModel, tokens::AbstractArray) = count(lm.counts, tokens)
 p(lm, history, token) = p(lm.model, lm.counts, history, token)
 
 train!(lm::LanguageModel, sentence) = add_ngrams!(lm.counts, sentence)

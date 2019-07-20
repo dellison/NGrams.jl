@@ -34,7 +34,7 @@ function add_ngrams!(grams::NGramCounter{T}, tokens) where T
 end
 
 count(counts::NGramCounter{T}, token::T) where T = total(get(counts.counts, token, 0))
-function count(counts::NGramCounter, tokens)
+function count(grams::NGramCounter, tokens::AbstractArray)
     c = grams
     for token in tokens
         c = get(c.counts, token, nothing)
