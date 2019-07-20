@@ -7,4 +7,4 @@ makedocs(sitename = "NGrams.jl",
                   "N-Grams" => "ngrams.md"],
          doctest = true)
 
-# deploydocs(repo = "github.com/dellison/NGrams.jl.git")
+deploydocs(repo = "github.com/dellison/NGrams.jl.git")
