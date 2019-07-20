@@ -1,0 +1,4 @@
+name = "NGrams"
+uuid = "fa66d9a0-aac3-11e9-0caa-27cf2f4cbb92"
+authors = ["David Ellison <davidehellison@gmail.com>"]
+version = "0.1.0"
