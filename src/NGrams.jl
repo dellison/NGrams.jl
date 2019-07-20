@@ -3,11 +3,16 @@ module NGrams
 const BOS = "*BOS*"
 const EOS = "*EOS*"
 
-import Base: collect, eltype, iterate, length
+import Base: collect, count, eltype, iterate, length
 
 export NGram, Unigram, Bigram, Trigram
 export ngrams, unigrams, bigrams, trigrams
 
+export LanguageModel, train_lm
+export MLE
+
 include("grams.jl")
+include("counts.jl")
+include("languagemodels.jl")
 
 end # module
