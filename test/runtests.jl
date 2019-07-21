@@ -42,7 +42,7 @@ using NGrams, Test
         corpus = [split(line) for line in split(strip(corpus), "\n")]
 
         @test length(corpus) == 6
-        @test length.(corpus) == [5, 6, 8, 6, 7, 9]
+        @test length.(corpus) == [5, 6, 8, 6, 7, 9] # 41 words total
 
         @testset "MLE" begin
             lm = train_lm(corpus, 2, MLE())
@@ -51,6 +51,9 @@ using NGrams, Test
             @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
             @test NGrams.count(lm, "i") == 4
             @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, "<unk>") == 0.
+            @test NGrams.p(lm, "*BOS*") == NGrams.p(lm, "*EOS*") == (6 / (41 + 12))
+            @test NGrams.p(lm, "don't") == 2 / (41 + 12)
             @test NGrams.p(lm, ["i"], "<unk>") == 0.
             @test NGrams.p(lm, ["i"], "don't") == 0.5
             @test NGrams.p(lm, ["i"], "keep") == 0.25
@@ -67,6 +70,9 @@ using NGrams, Test
             @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
             @test NGrams.count(lm, "i") == 4
             @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, "<unk>") == 1 / (53 + 35)
+            @test NGrams.p(lm, "*BOS*") == 7 / (53 + 35)
+            @test NGrams.p(lm, "don't") == 3 / (53 + 35)
             @test NGrams.p(lm, ["i"], "<unk>") == 1 / (4 + 34)
             @test NGrams.p(lm, ["i"], "don't") == 3 / (4 + 34)
             @test NGrams.p(lm, ["i"], "keep") == 2 / (4 + 34)
@@ -83,6 +89,9 @@ using NGrams, Test
             @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
             @test NGrams.count(lm, "i") == 4
             @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, "<unk>") == 0.1 / (53 + 3.5)
+            @test NGrams.p(lm, "*BOS*") == 6.1 / (53 + 3.5)
+            @test NGrams.p(lm, "don't") == 2.1 / (53 + 3.5)
             @test NGrams.p(lm, ["i"], "<unk>") == 0.1 / (4 + 3.4)
             @test NGrams.p(lm, ["i"], "don't") == 2.1 / (4 + 3.4)
             @test NGrams.p(lm, ["i"], "keep") == 1.1 / (4 + 3.4)

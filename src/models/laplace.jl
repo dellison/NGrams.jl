@@ -12,3 +12,9 @@ function p(model::Laplace, counts, history, token)
     V = length(counts.counts)
     return (c + 1) / (N + V)
 end
+
+function p(model::Laplace, counts, token)
+    c, N = observed_ratio(counts, token)
+    V = length(counts.counts)
+    return (c + 1) / (N + V)
+end

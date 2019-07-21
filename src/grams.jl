@@ -9,10 +9,8 @@ const Trigram{T}  = NGram{3, T}
 Return a sequence of n-grams (of length `n`) from `tokens`.
 """
 function ngrams(n::Int, tokens; add_bos=true, bos=BOS, add_eos=true, eos=EOS)
-    tokens = tokens |>
-        (ts -> add_bos ? _add_bos(ts, isone(n) ? n : n-1, bos) : ts) |>
-        (ts -> add_eos ? _add_eos(ts, 1, eos) : ts)
-    return NGramIterator{n,typeof(tokens)}(n, tokens)
+    ts = add_tags(tokens, n, add_bos=add_bos, bos=bos, add_eos=add_eos, eos=eos)
+    return NGramIterator{n,typeof(ts)}(n, ts)
 end
 
 ngrams(tokens, n::Int; kwargs...) = ngrams(n, tokens; kwargs...)
@@ -41,6 +39,10 @@ trigrams(tokens; kwargs...) = ngrams(3, tokens; kwargs...)
 _add_bos(tokens, n, bos=BOS) = vcat(fill(bos, n), tokens)
 _add_eos(tokens, n, eos=EOS) = vcat(tokens, fill(eos, n))
 
+add_tags(tokens, n; add_bos=true, bos=BOS, add_eos=true, eos=EOS) =
+    tokens |>
+    (ts -> add_bos ? _add_bos(ts, isone(n) ? n : n-1, bos) : ts) |>
+    (ts -> add_eos ? _add_eos(ts, 1, eos) : ts)
 
 struct NGramIterator{N,T}
     n::Int

@@ -1,31 +1,48 @@
+mutable struct TokenCounter{T}
+    counts::Dict{T,Int}
+    total::Int
+end
+
+TokenCounter() = TokenCounter{Any}(Dict{Any,Int}(), 0)
+
+count(counts::TokenCounter, token) = get(counts.counts, token, 0)
+total(counts::TokenCounter) = counts.total
+
+observed_ratio(counts::TokenCounter, token) = (count(counts, token), total(counts))
+
+function add_tokens!(counts::TokenCounter, tokens)
+    for token in tokens
+        counts.counts[token] = get(counts.counts, token, 0) + 1
+    end
+    counts.total += length(tokens)
+    return counts
+end
+
 mutable struct NGramCounter{T}
     n::Int
-    bos::String
-    eos::String
     counts::Dict{T,NGramCounter{T}}
     total::Int
 end
 
-NGramCounter(n; bos=BOS, eos=EOS) = NGramCounter{Any}(n, bos=BOS, eos=EOS)
+NGramCounter(n) = NGramCounter{Any}(n)
 
-function NGramCounter{T}(n::Int; bos=BOS, eos=EOS) where T
+function NGramCounter{T}(n::Int) where T
     @assert 1 <= n
     counts = Dict{T,NGramCounter{T}}()
-    NGramCounter(n, bos, eos, counts, 0)
+    NGramCounter(n, counts, 0)
 end
 
 total(grams::NGramCounter) = grams.total
 total(x::Number) = x
 
-function add_ngrams!(grams::NGramCounter{T}, tokens) where T
-    for gram in ngrams(grams.n, tokens)
-        c = grams
+function add_ngrams!(counts::NGramCounter{T}, grams) where T
+    for gram in grams
+        c = counts
         for token in gram
             c.total += 1
             c = get!(c.counts, token) do
-                n, bos, eos = grams.n - 1, grams.bos, grams.eos
-                counts = Dict{T,NGramCounter{T}}()
-                NGramCounter{T}(n, bos, eos, counts, 0)
+                n, gcounts = c.n - 1, Dict{T,NGramCounter{T}}()
+                NGramCounter{T}(n, gcounts, 0)
             end
         end
         c.total += 1

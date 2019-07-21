@@ -13,3 +13,8 @@ function p(model::AddK, counts, history, token)
     return (c + k) / (N + k * V)
 end
 
+function p(model::AddK, counts, token)
+    c, N = observed_ratio(counts, token)
+    V, k = length(counts.counts), model.k
+    return (c + k) / (N + k * V)
+end

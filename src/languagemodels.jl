@@ -1,6 +1,9 @@
 struct LanguageModel{T}
+    bos::T
+    eos::T
     counts::NGramCounter
-    model::T
+    tokens::TokenCounter
+    model
 end
 
 """
@@ -9,13 +12,21 @@ end
 Create a language model with n-gram length `n` and probability model `model`.
 """
 LanguageModel(n::Int, model; bos=BOS, eos=EOS) =
-    LanguageModel(NGramCounter(n; bos=bos, eos=eos), model)
+    LanguageModel(bos, eos, NGramCounter(n), TokenCounter(), model)
 
-count(lm::LanguageModel, token) = count(lm.counts, [token])
+# count(lm::LanguageModel, token) = count(lm.counts, [token])
+count(lm::LanguageModel, token) = count(lm.tokens, token)
 count(lm::LanguageModel, tokens::AbstractArray) = count(lm.counts, tokens)
 p(lm, history, token) = p(lm.model, lm.counts, history, token)
+p(lm, token) = p(lm.model, lm.tokens, token)
 
-train!(lm::LanguageModel, sentence) = add_ngrams!(lm.counts, sentence)
+function train!(lm::LanguageModel, sentence)
+    n, bos, eos = lm.counts.n, lm.bos, lm.eos
+    tokens = add_tags(sentence, n, bos=bos, eos=eos)
+    add_tokens!(lm.tokens, tokens)
+    add_ngrams!(lm.counts, ngrams(n, tokens, add_bos=false, add_eos=false))
+    return lm
+end
 
 """
     train_lm(corpus, n, model; bos=BOS, eos=EOS)
