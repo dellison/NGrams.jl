@@ -17,6 +17,11 @@ p(lm, history, token) = p(lm.model, lm.counts, history, token)
 
 train!(lm::LanguageModel, sentence) = add_ngrams!(lm.counts, sentence)
 
+"""
+    train_lm(corpus, n, model; bos=BOS, eos=EOS)
+
+Train a language model.
+"""
 function train_lm(corpus, n, model; bos=BOS, eos=EOS)
     lm = LanguageModel(n, model; bos=bos, eos=eos)
     for sentence in corpus
@@ -26,3 +31,5 @@ function train_lm(corpus, n, model; bos=BOS, eos=EOS)
 end
 
 include("models/mle.jl")
+include("models/laplace.jl")
+include("models/addk.jl")

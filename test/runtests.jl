@@ -51,9 +51,42 @@ using NGrams, Test
             @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
             @test NGrams.count(lm, "i") == 4
             @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, ["i"], "<unk>") == 0.
             @test NGrams.p(lm, ["i"], "don't") == 0.5
             @test NGrams.p(lm, ["i"], "keep") == 0.25
             @test NGrams.p(lm, ["i"], "guess") == 0.25
+        end
+
+        @testset "Laplace Smoothing" begin
+            lm = train_lm(corpus, 2, Laplace())
+            # V is the size of the vocabulary (plus the OOV token <unk>)
+            V = length(unique(Base.Iterators.flatten(corpus))) + 1
+            @test V == 34
+
+            @test NGrams.count(lm, "<unk>") == 0
+            @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
+            @test NGrams.count(lm, "i") == 4
+            @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, ["i"], "<unk>") == 1 / (4 + 34)
+            @test NGrams.p(lm, ["i"], "don't") == 3 / (4 + 34)
+            @test NGrams.p(lm, ["i"], "keep") == 2 / (4 + 34)
+            @test NGrams.p(lm, ["i"], "guess") ==  2 / (4 + 34)
+        end
+
+        @testset "Add-k Smoothing" begin
+            lm = train_lm(corpus, 2, AddK(0.1))
+            # V is the size of the vocabulary (plus the OOV token <unk>)
+            V = length(unique(Base.Iterators.flatten(corpus))) + 0.1
+            @test V == 33.1
+
+            @test NGrams.count(lm, "<unk>") == 0
+            @test NGrams.count(lm, ["<unk>", "<unk>"]) == 0
+            @test NGrams.count(lm, "i") == 4
+            @test NGrams.count(lm, ["i", "don't"]) == 2
+            @test NGrams.p(lm, ["i"], "<unk>") == 0.1 / (4 + 3.4)
+            @test NGrams.p(lm, ["i"], "don't") == 2.1 / (4 + 3.4)
+            @test NGrams.p(lm, ["i"], "keep") == 1.1 / (4 + 3.4)
+            @test NGrams.p(lm, ["i"], "guess") ==  1.1 / (4 + 3.4)
         end
     end
 
