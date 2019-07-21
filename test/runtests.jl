@@ -97,6 +97,13 @@ using NGrams, Test
             @test NGrams.p(lm, ["i"], "keep") == 1.1 / (4 + 3.4)
             @test NGrams.p(lm, ["i"], "guess") ==  1.1 / (4 + 3.4)
         end
+
+        @testset "Linear Interpolation" begin
+            lm = train_lm(corpus, 2, LinearInterpolation([0.8, 0.2]))
+
+            @test NGrams.p(lm, ["i"], "<unk>") == 0.0
+            @test NGrams.p(lm, ["i"], "don't") == .2 * 2/47 + 0.8 * 2/4
+        end
     end
 
 end

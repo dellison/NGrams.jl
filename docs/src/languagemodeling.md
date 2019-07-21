@@ -10,14 +10,11 @@ LanguageModel
 train_lm
 ```
 
-<!-- ## Evaluation -->
-
-<!-- ## Generation -->
-
 ## Probability and Smoothing
 
 ```@docs
 MLE
 AddK
 Laplace
+LinearInterpolation
 ```

@@ -9,7 +9,7 @@ export NGram, Unigram, Bigram, Trigram
 export ngrams, unigrams, bigrams, trigrams
 
 export LanguageModel, train_lm
-export MLE, Laplace, Add1, AddK
+export MLE, Laplace, Add1, AddK, LinearInterpolation
 
 include("grams.jl")
 include("counts.jl")

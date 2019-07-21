@@ -44,3 +44,4 @@ end
 include("models/mle.jl")
 include("models/laplace.jl")
 include("models/addk.jl")
+include("models/interpolation.jl")
