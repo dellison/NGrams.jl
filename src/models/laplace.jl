@@ -4,7 +4,7 @@
 Laplace (add-1) probability smoothing for n-gram language modeling.
 """
 struct Laplace end
-    
+
 const Add1Smoothing = Laplace
 
 function p(model::Laplace, counts, history, token)

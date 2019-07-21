@@ -9,4 +9,3 @@ function p(::MLE, counts, history, token)
     count, total = observed_ratio(counts, history, token)
     return count / total
 end
-    
