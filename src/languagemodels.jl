@@ -29,7 +29,7 @@ function train!(lm::LanguageModel, sentence)
 end
 
 """
-    train_lm(corpus, n, model; bos=BOS, eos=EOS)
+    train_lm(corpus, n, model; bos="*BOS*", eos="*EOS*")
 
 Train a language model.
 """
