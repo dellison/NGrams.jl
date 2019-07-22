@@ -104,6 +104,13 @@ using NGrams, Test
             @test NGrams.p(lm, ["i"], "<unk>") == 0.0
             @test NGrams.p(lm, ["i"], "don't") == .2 * 2/47 + 0.8 * 2/4
         end
+
+        @testset "Absolute Discounting" begin
+            lm = train_lm(corpus, 2, AbsoluteDiscounting(0.5))
+            @test NGrams.p(lm, "<unk>") == 0.0
+            @test NGrams.p(lm, "road") == 0.5 / 53
+            @test NGrams.p(lm, "sometimes") == 1.5 / 53
+        end
     end
 
 end

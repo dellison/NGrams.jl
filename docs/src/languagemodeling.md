@@ -17,4 +17,5 @@ MLE
 AddK
 Laplace
 LinearInterpolation
+AbsoluteDiscounting
 ```
