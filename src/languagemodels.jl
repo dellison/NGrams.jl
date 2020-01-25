@@ -4,6 +4,12 @@ mutable struct LanguageModel{N,T,P}
     seq::NGramCounts{N,T}
     estimator::P
 end
+
+"""
+   LanguageModel(N; bos, eos, estimator=NGrams.MLE())
+
+Create an `N`-gram language model, estimating probabilities with `estimator`.
+"""
 LanguageModel(N::Int; bos=BOS, eos=EOS, estimator=MLE()) =
     LanguageModel(N, bos, eos, estimator)
 LanguageModel(N::Int, bos::T, eos::T, estimator=MLE()) where T =
@@ -20,6 +26,11 @@ function Base.count(m::LanguageModel, gram::Tuple)
     return total(m)
 end
 
+"""
+    NGrams.observe!(lm::LanguageModel, xs)
+
+Train the language model by observing a sequence of tokens.
+"""
 function observe!(m::LanguageModel{N,T,P}, xs) where {N,T,P}
     for gram in ngrams(xs, N; bos=m.bos, eos=m.eos)
         inc!(m.seq, gram)

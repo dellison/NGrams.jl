@@ -7,9 +7,19 @@ abstract type ProbabilityEstimator end
 prob(p::ProbabilityEstimator, counts, h, x) = prob(p, submodel(counts, h), x)
 prob(p::ProbabilityEstimator, counts, x)    = error("not implemented!")
 
+"""
+    NGrams.MLE()
+
+Maximum Likelihood Estimation for n-gram language modeling.
+"""
 struct MLE <: ProbabilityEstimator end
 prob(::MLE, counts, x) = count(counts, x) / total(counts)
 
+"""
+    NGrams.AddK(k::Number)
+
+Add-k probability smoothing for n-gram language modeling.
+"""
 struct AddK{K<:Number} <: ProbabilityEstimator
     k::K
 end
@@ -18,6 +28,11 @@ function prob(k::AddK, counts, x)
     (c + k.k) / (tot + (n * k.k) + k.k)
 end
 
+"""
+    NGrams.Laplace()
+
+Laplace (add-1) smoothing for n-gram language modeling.
+"""
 struct Laplace <: ProbabilityEstimator end
 const Add1 = Laplace
 function prob(::Laplace, counts, x)
@@ -25,11 +40,21 @@ function prob(::Laplace, counts, x)
     return (c + one(c)) / (tot + length(counts) + one(c))
 end
 
+"""
+    NGrams.AbsoluteDiscounting(d::Number)
+
+Absolute discounting for n-gram language modeling.
+"""
 struct AbsoluteDiscounting{D<:Number} <: ProbabilityEstimator
     d::D
 end
 prob(d::AbsoluteDiscounting, counts, x) = max(count(counts, x) - d.d, 0) / total(counts)
 
+"""
+    LinearInterpolation(λ)
+
+Linear interpolation for probability smoothing in n-gram language modeling.
+"""
 struct LinearInterpolation{N,T<:Number} <: ProbabilityEstimator
     lambda::NTuple{N,T}
     function LinearInterpolation(λ::Tuple)

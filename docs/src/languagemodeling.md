@@ -1,21 +1,21 @@
 # Language Models
 
 ```@docs
-LanguageModel
+NGrams.LanguageModel
 ```
 
 ## Training
 
 ```@docs
-train_lm
+NGrams.observe!
 ```
 
 ## Probability and Smoothing
 
 ```@docs
-MLE
-AddK
-Laplace
-LinearInterpolation
-AbsoluteDiscounting
+NGrams.MLE
+NGrams.AddK
+NGrams.Laplace
+NGrams.LinearInterpolation
+NGrams.AbsoluteDiscounting
 ```
