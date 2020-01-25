@@ -27,6 +27,9 @@ using NGrams, Test
             @test collect(ngrams(n, corpus)) == collect(ngrams(corpus, n))
             @test collect(ngrams(n, 1:5)) == collect(ngrams(1:5, n))
         end
+
+        @test collect(ngrams(3, 1:5, bos=nothing, eos=nothing)) ==
+            [(1,2,3), (2,3,4), (3,4,5)] # padless
     end
 
     @testset "Language Models" begin

@@ -7,7 +7,9 @@ gram(x)                 = (x,)
 gram(x::AbstractVector) = Tuple(x)
 gram(x::Tuple)          = x
 
-pad(sequence, n, bos, eos) = vcat(fill(bos, n), sequence, fill(eos, n))
+pad(sequence, n, bos, eos) = vcat(bos === nothing ? [] : fill(bos, n),
+                                  sequence,
+                                  eos === nothing ? [] : fill(eos, n))
 
 """
     ngrams(tokens, n; add_bos=true, bos=BOS, add_eos=true, eos=EOS) 
