@@ -1,48 +1,33 @@
-struct LanguageModel{T}
+mutable struct LanguageModel{N,T,P}
     bos::T
     eos::T
-    counts::NGramCounter
-    tokens::TokenCounter
-    model
+    seq::NGramCounts{N,T}
+    estimator::P
 end
+LanguageModel(N::Int; bos=BOS, eos=EOS, estimator=MLE()) =
+    LanguageModel(N, bos, eos, estimator)
+LanguageModel(N::Int, bos::T, eos::T, estimator=MLE()) where T =
+    LanguageModel{N,T,typeof(estimator)}(bos, eos, NGramCounts{N,T}(), estimator)
+LanguageModel(N::Int, p::ProbabilityEstimator; bos=BOS, eos=EOS) =
+    LanguageModel{N,Any,typeof(p)}(bos, eos, NGramCounts{N,Any}(), p)
 
-"""
-    LanguageModel(n::Int, model; bos="*BOS*", eos="*EOS*")
-
-Create a language model with n-gram length `n` and probability model `model`.
-"""
-LanguageModel(n::Int, model; bos=BOS, eos=EOS) =
-    LanguageModel(bos, eos, NGramCounter(n), TokenCounter(), model)
-
-# count(lm::LanguageModel, token) = count(lm.counts, [token])
-count(lm::LanguageModel, token) = count(lm.tokens, token)
-count(lm::LanguageModel, tokens::AbstractArray) = count(lm.counts, tokens)
-p(lm, history, token) = p(lm.model, lm.counts, history, token)
-p(lm, token) = p(lm.model, lm.tokens, token)
-
-function train!(lm::LanguageModel, sentence)
-    n, bos, eos = lm.counts.n, lm.bos, lm.eos
-    tokens = add_tags(sentence, n, bos=bos, eos=eos)
-    add_tokens!(lm.tokens, tokens)
-    add_ngrams!(lm.counts, ngrams(n, tokens, add_bos=false, add_eos=false))
-    return lm
-end
-
-"""
-    train_lm(corpus, n, model; bos="*BOS*", eos="*EOS*")
-
-Train a language model.
-"""
-function train_lm(corpus, n, model; bos=BOS, eos=EOS)
-    lm = LanguageModel(n, model; bos=bos, eos=eos)
-    for sentence in corpus
-        train!(lm, sentence)
+Base.count(m::LanguageModel, v::AbstractVector) = count(m, tuple(v...))
+Base.count(m::LanguageModel{N,T,P}, x::T) where {N,T,P} = total(submodel(m, x))
+function Base.count(m::LanguageModel, gram::Tuple)
+    for x in gram
+        m = submodel(m, x)
     end
-    return lm
+    return total(m)
 end
 
-include("models/mle.jl")
-include("models/laplace.jl")
-include("models/addk.jl")
-include("models/interpolation.jl")
-include("models/discounting.jl")
+function observe!(m::LanguageModel{N,T,P}, xs) where {N,T,P}
+    for gram in ngrams(xs, N; bos=m.bos, eos=m.eos)
+        inc!(m.seq, gram)
+    end
+end
+    
+prob(m::LanguageModel, a...) = prob(m.estimator, m.seq, gram.(a)...)
+
+for f in (:gram_size, :order, :submodel, :submodel!, :total)
+    @eval $f(m::LanguageModel, a...; kw...) = $f(m.seq, a...; kw...)
+end

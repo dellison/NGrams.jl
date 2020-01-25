@@ -1,61 +1,59 @@
-const NGram{N, T} = NTuple{N, T}
-const Unigram{T}  = NGram{1, T}
-const Bigram{T}   = NGram{2, T}
-const Trigram{T}  = NGram{3, T}
+const NGram{N, T} = NTuple{N,T}
+const Unigram{T}  = NGram{1,T}
+const Bigram{T}   = NGram{2,T}
+const Trigram{T}  = NGram{3,T}
+
+gram(x)                 = (x,)
+gram(x::AbstractVector) = Tuple(x)
+gram(x::Tuple)          = x
+
+pad(sequence, n, bos, eos) = vcat(fill(bos, n), sequence, fill(eos, n))
 
 """
-    ngrams(n, tokens; add_bos=true, bos=BOS, add_eos=true, eos=EOS) 
+    ngrams(tokens, n; add_bos=true, bos=BOS, add_eos=true, eos=EOS) 
 
-Return a sequence of n-grams (of length `n`) from `tokens`.
+Iterate over a sequence of n-grams (of length `n`) from `tokens`.
 """
-function ngrams(n::Int, tokens; add_bos=true, bos=BOS, add_eos=true, eos=EOS)
-    ts = add_tags(tokens, n, add_bos=add_bos, bos=bos, add_eos=add_eos, eos=eos)
-    return NGramIterator{n,typeof(ts)}(n, ts)
-end
-
-ngrams(tokens, n::Int; kwargs...) = ngrams(n, tokens; kwargs...)
+ngrams(xs::AbstractVector, n::Int; bos=BOS, eos=EOS) = NGramIterator(n, pad(xs, n-1, bos, eos))
+ngrams(xs, n::Int; kw...) = ngrams(collect(xs), n; kw...)
+ngrams(n::Int, xs; kw...) = ngrams(xs, n; kw...)
 
 """
     unigrams(tokens)
 
 Return a sequence of unigrams from `tokens`.
 """
-unigrams(tokens; kwargs...) = ngrams(1, tokens; kwargs...)
+unigrams(xs) = map(tuple, xs)
 
 """
-    bigrams(tokens)
+    bigrams(xs; bos="*BOS*", eos="*EOS*")
 
-Return a sequence of bigrams from `tokens`.
+Iterate over a sequence of bigrams from `xs`.
 """
-bigrams(tokens; kwargs...)  = ngrams(2, tokens; kwargs...)
+bigrams(xs; kw...) = ngrams(xs, 2; kw...)
 
 """
-    trigrams(tokens)
+    trigrams(xs; bos="*BOS*", eos="*EOS*")
 
-Return a sequence of trigrams from `tokens`.
+Iterate over a sequence of trigrams from `xs`.
 """
-trigrams(tokens; kwargs...) = ngrams(3, tokens; kwargs...)
-
-_add_bos(tokens, n, bos=BOS) = vcat(fill(bos, n), tokens)
-_add_eos(tokens, n, eos=EOS) = vcat(tokens, fill(eos, n))
-
-add_tags(tokens, n; add_bos=true, bos=BOS, add_eos=true, eos=EOS) =
-    tokens |>
-    (ts -> add_bos ? _add_bos(ts, isone(n) ? n : n-1, bos) : ts) |>
-    (ts -> add_eos ? _add_eos(ts, 1, eos) : ts)
+trigrams(xs; ks...) = ngrams(xs, 3; ks...)
 
 struct NGramIterator{N,T}
     n::Int
     tokens::T
 end
+NGramIterator(N::Int, xs) = NGramIterator{N,typeof(xs)}(N,xs)
 
-collect(ngrams::NGramIterator) = [gram for gram in ngrams]
+Base.collect(ngrams::NGramIterator) = [gram for gram in ngrams]
+Base.eltype(::NGramIterator{N,T}) where {N,T} = NGram{N,T}
 
-eltype(::NGramIterator{N,T}) where {N,T} = NGram{N,T}
-
-function iterate(ngrams::NGramIterator, state=1)
+function Base.iterate(ngrams::NGramIterator, state=1)
     state > length(ngrams.tokens) - ngrams.n + 1 && return nothing
     return tuple(view(ngrams.tokens, state:state+ngrams.n-1)...), state + 1
 end
 
-length(ngrams::NGramIterator) = length(ngrams.tokens) - ngrams.n + 1
+Base.length(ngrams::NGramIterator) = length(ngrams.tokens) - ngrams.n + 1
+
+Base.IteratorSize(::Type{<:NGramIterator{N,T}}) where {N,T} = Base.HasLength()
+Base.IteratorEltype(::Type{<:NGramIterator{N,T}}) where {N,T} = NGram{N,T}
