@@ -6,7 +6,7 @@ mutable struct LanguageModel{N,T,P}
 end
 
 """
-   LanguageModel(N; bos, eos, estimator=NGrams.MLE())
+    LanguageModel(N; bos, eos, estimator=NGrams.MLE())
 
 Create an `N`-gram language model, estimating probabilities with `estimator`.
 """
