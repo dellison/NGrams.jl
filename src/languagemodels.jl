@@ -18,7 +18,7 @@ LanguageModel(N::Int, p::ProbabilityEstimator; bos=BOS, eos=EOS) =
     LanguageModel{N,Any,typeof(p)}(bos, eos, NGramCounts{N,Any}(), p)
 
 Base.count(m::LanguageModel, v::AbstractVector) = count(m, tuple(v...))
-Base.count(m::LanguageModel{N,T,P}, x::T) where {N,T,P} = total(submodel(m, x))
+Base.count(m::LanguageModel{N,T,P}, x::T) where {N,T,P} = total(submodel(m.seq, x))
 function Base.count(m::LanguageModel, gram::Tuple)
     for x in gram
         m = submodel(m, x)
@@ -39,6 +39,10 @@ end
     
 prob(m::LanguageModel, a...) = prob(m.estimator, m.seq, gram.(a)...)
 
-for f in (:gram_size, :order, :submodel, :submodel!, :total)
+submodel(m::LanguageModel, x) =
+    LanguageModel(m.bos, m.eos, submodel(m.seq, x), m.estimator)
+
+for f in (:gram_size, :order, :total)
     @eval $f(m::LanguageModel, a...; kw...) = $f(m.seq, a...; kw...)
 end
+
