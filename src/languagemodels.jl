@@ -27,12 +27,12 @@ function Base.count(m::LanguageModel, gram::Tuple)
 end
 
 """
-    NGrams.observe!(lm::LanguageModel, xs)
+    NGrams.observe!(lm::LanguageModel, tokens)
 
 Train the language model by observing a sequence of tokens.
 """
-function observe!(m::LanguageModel{N,T,P}, xs) where {N,T,P}
-    for gram in ngrams(xs, N; bos=m.bos, eos=m.eos)
+function observe!(m::LanguageModel{N,T,P}, tokens) where {N,T,P}
+    for gram in ngrams(tokens, N; bos=m.bos, eos=m.eos)
         inc!(m.seq, gram)
     end
 end
