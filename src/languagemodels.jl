@@ -27,11 +27,11 @@ function Base.count(m::LanguageModel, gram::Tuple)
 end
 
 """
-    NGrams.observe!(lm::LanguageModel, tokens)
+    NGrams.fit!(lm::LanguageModel, tokens)
 
 Train the language model by observing a sequence of tokens.
 """
-function observe!(m::LanguageModel{N,T,P}, tokens) where {N,T,P}
+function fit!(m::LanguageModel{N,T,P}, tokens) where {N,T,P}
     for gram in ngrams(tokens, N; bos=m.bos, eos=m.eos)
         inc!(m.seq, gram)
     end
@@ -46,3 +46,39 @@ for f in (:gram_size, :order, :total)
     @eval $f(m::LanguageModel, a...; kw...) = $f(m.seq, a...; kw...)
 end
 
+
+function generate(m::LanguageModel, num_words=1, text_seed=String[])
+    # todo random seed for repro
+    @assert num_words >= 1
+    output = copy(text_seed)
+    while length(output) < num_words - length(text_seed)
+        push!(output, sample(submodel(m, _hist(m, output)), keys(m.seq)))
+    end
+    return output
+end
+
+sample(lm::LanguageModel, a...; k...) = sample(Random.GLOBAL_RNG, lm, a...; k...)
+function sample(rng::AbstractRNG, lm::LanguageModel, vocabulary=keys(lm.seq))
+    t = rand(rng)# * total(lm)
+    words = keys(lm.seq)
+    n = length(words)
+    i = 1
+    cw = 0
+    for word in words
+        cw += prob(lm, word)
+        if cw >= t
+            return word
+        end
+    end
+    return lm.bos # last(words) # ??
+end
+
+# relevant history
+function _hist(m::LanguageModel, xs)
+    n = gram_size(m) - 2
+    if n >= length(xs) # need to pad
+        return gram(vcat(repeat([m.bos], n - length(xs) + 1), xs))
+    else
+        return gram(xs[end-n:end])
+    end
+end

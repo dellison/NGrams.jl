@@ -1,5 +1,7 @@
 module NGrams
 
+using Random
+
 const BOS = "*BOS*"
 const EOS = "*EOS*"
 

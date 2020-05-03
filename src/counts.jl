@@ -5,7 +5,7 @@ end
 NGramCounts{N,T}() where {N,T} = NGramCounts{N,T}(Dict{T,NGramCounts{N-1,T}}(), 0)
 
 Base.count(c::NGramCounts, x) = total(submodel(c, x))
-
+Base.keys(c::NGramCounts) = keys(c.counts)
 Base.length(c::NGramCounts) = length(c.counts)
 
 total(c::NGramCounts) = c.total

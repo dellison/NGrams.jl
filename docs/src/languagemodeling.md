@@ -7,7 +7,7 @@ NGrams.LanguageModel
 ## Training
 
 ```@docs
-NGrams.observe!
+NGrams.fit!
 ```
 
 ## Probability and Smoothing

@@ -50,6 +50,14 @@ struct AbsoluteDiscounting{D<:Number} <: ProbabilityEstimator
 end
 prob(d::AbsoluteDiscounting, counts, x) = max(count(counts, x) - d.d, 0) / total(counts)
 
+struct Interpolated{N,T<:Number}
+    k::NTuple{N,T}
+end
+
+Base.getindex(l::Interpolated, i) = l.k[i]
+Base.lastindex(l::Interpolated) = length(l.k)
+
+
 """
     LinearInterpolation(λ)
 
@@ -57,6 +65,7 @@ Linear interpolation for probability smoothing in n-gram language modeling.
 """
 struct LinearInterpolation{N,T<:Number} <: ProbabilityEstimator
     lambda::NTuple{N,T}
+
     function LinearInterpolation(λ::Tuple)
         @assert sum(λ) == 1.
         N, T = length(λ), eltype(λ)

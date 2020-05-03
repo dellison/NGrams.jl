@@ -56,7 +56,7 @@ using NGrams, Test
         function train_lm(corpus, N, estimator)
             lm = NGrams.LanguageModel(N, estimator)
             for sentence in corpus
-                NGrams.observe!(lm, sentence)
+                NGrams.fit!(lm, sentence)
             end
             return lm
         end
