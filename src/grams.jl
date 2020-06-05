@@ -48,7 +48,7 @@ end
 NGramIterator(N::Int, xs) = NGramIterator{N,typeof(xs)}(N,xs)
 
 Base.collect(ngrams::NGramIterator) = [gram for gram in ngrams]
-Base.eltype(::NGramIterator{N,T}) where {N,T} = NGram{N,T}
+Base.eltype(::NGramIterator{N,T}) where {N,T} = NGram{N,eltype(T)}
 
 function Base.iterate(ngrams::NGramIterator, state=1)
     state > length(ngrams.tokens) - ngrams.n + 1 && return nothing
@@ -58,4 +58,4 @@ end
 Base.length(ngrams::NGramIterator) = length(ngrams.tokens) - ngrams.n + 1
 
 Base.IteratorSize(::Type{<:NGramIterator{N,T}}) where {N,T} = Base.HasLength()
-Base.IteratorEltype(::Type{<:NGramIterator{N,T}}) where {N,T} = NGram{N,T}
+Base.IteratorEltype(::Type{<:NGramIterator{N,T}}) where {N,T} = NGram{N,eltype(T)}
