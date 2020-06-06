@@ -57,17 +57,21 @@ end
 Base.getindex(l::Interpolated, i) = l.k[i]
 Base.lastindex(l::Interpolated) = length(l.k)
 
-
 """
     LinearInterpolation(λ)
 
 Linear interpolation for probability smoothing in n-gram language modeling.
+
+`λ` should be a vector or tuple of linear coefficients for smoothing the model.
+The coeffients are ordered occording to the n-gram complexity of the model; i.e.,
+the first element is the weight for the model without any backoff, and the final
+element is the weight for the unigram model.
 """
 struct LinearInterpolation{N,T<:Number} <: ProbabilityEstimator
     lambda::NTuple{N,T}
 
     function LinearInterpolation(λ::Tuple)
-        @assert sum(λ) == 1.
+        @assert sum(λ) == 1. "coefficients must sum to 1!"
         N, T = length(λ), eltype(λ)
         new{N,T}(λ)
     end
