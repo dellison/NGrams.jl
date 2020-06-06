@@ -131,6 +131,18 @@ using NGrams, Test
                 x = last(NGrams.generate(lm, 3, ["this", "is"]))
                 @test x in ("good", "bad")
             end
+
+            NGrams.fit!(lm, ["this", "is", "neutral"])
+
+            counts, total = Dict(), 0
+            for _ in 1:10000
+                token = NGrams.generate(lm, 3, ["this", "is"]) |> last
+                counts[token] = get(counts, token, 0) + 1
+                total += 1
+            end
+            for token in ("good", "bad", "neutral")
+                @test counts[token] / total ≈ 0.33 atol=0.01
+            end
         end
     end
 
