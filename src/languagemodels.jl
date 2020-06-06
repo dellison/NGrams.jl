@@ -47,16 +47,29 @@ for f in (:gram_size, :order, :total)
 end
 
 
+"""
+    NGrams.generate(lm, num_words=1, text_seed=[])
+
+Randomly generate `num_words` from language model.
+
+If `text_seed` is provided, output is conditioned on that history.
+The seed is included in the return value and counts against `num_words`.
+"""
 function generate(m::LanguageModel, num_words=1, text_seed=String[])
     # todo random seed for repro
     @assert num_words >= 1
     output = copy(text_seed)
-    while length(output) < num_words - length(text_seed)
+    while length(output) < num_words# - length(text_seed)
         push!(output, sample(submodel(m, _hist(m, output)), keys(m.seq)))
     end
     return output
 end
 
+"""
+    NGrams.sample([rng::AbstractRNG,] lm, [vocabulary])
+
+Sample a single token from the language model.
+"""
 sample(lm::LanguageModel, a...; k...) = sample(Random.GLOBAL_RNG, lm, a...; k...)
 function sample(rng::AbstractRNG, lm::LanguageModel, vocabulary=keys(lm.seq))
     t = rand(rng)# * total(lm)

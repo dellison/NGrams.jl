@@ -16,7 +16,8 @@ pad(sequence, n, bos, eos) = vcat(bos === nothing ? [] : fill(bos, n),
 
 Iterate over a sequence of n-grams (of length `n`) from `tokens`.
 """
-ngrams(xs::AbstractVector, n::Int; bos=BOS, eos=EOS) = NGramIterator(n, pad(xs, n-1, bos, eos))
+ngrams(xs::AbstractVector, n::Int; bos=BOS, eos=EOS) =
+    NGramIterator(n, pad(xs, n-1, bos, eos))
 ngrams(xs, n::Int; kw...) = ngrams(collect(xs), n; kw...)
 ngrams(n::Int, xs; kw...) = ngrams(xs, n; kw...)
 

@@ -121,6 +121,17 @@ using NGrams, Test
             @test NGrams.prob(lm, "road") == 0.5 / corpus_size
             @test NGrams.prob(lm, "sometimes") == 1.5 / corpus_size
         end
+
+        @testset "Generation" begin
+            lm = NGrams.LanguageModel(3)
+            NGrams.fit!(lm, ["this", "is", "good"])
+            NGrams.fit!(lm, ["this", "is", "bad"])
+
+            for i in 1:10
+                x = last(NGrams.generate(lm, 3, ["this", "is"]))
+                @test x in ("good", "bad")
+            end
+        end
     end
 
 end

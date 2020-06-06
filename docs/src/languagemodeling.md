@@ -19,3 +19,10 @@ NGrams.Laplace
 NGrams.LinearInterpolation
 NGrams.AbsoluteDiscounting
 ```
+
+## Sampling from a language model
+
+```@docs
+NGrams.sample
+NGrams.generate
+```
