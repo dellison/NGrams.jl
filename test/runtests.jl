@@ -141,7 +141,7 @@ using NGrams, Test
                 total += 1
             end
             for token in ("good", "bad", "neutral")
-                @test counts[token] / total ≈ 0.33 atol=0.01
+                @test counts[token] / total ≈ 0.33 atol=0.02
             end
         end
     end
