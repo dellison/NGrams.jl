@@ -50,13 +50,6 @@ struct AbsoluteDiscounting{D<:Number} <: ProbabilityEstimator
 end
 prob(d::AbsoluteDiscounting, counts, x) = max(count(counts, x) - d.d, 0) / total(counts)
 
-struct Interpolated{N,T<:Number}
-    k::NTuple{N,T}
-end
-
-Base.getindex(l::Interpolated, i) = l.k[i]
-Base.lastindex(l::Interpolated) = length(l.k)
-
 """
     LinearInterpolation(λ)
 
