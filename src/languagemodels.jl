@@ -40,14 +40,18 @@ function fit!(m::LanguageModel{N,T,P}, tokens) where {N,T,P}
     end
 end
     
+gram_size(m::LanguageModel) = gram_size(m.seq)
+
+order(m::LanguageModel) = order(m.seq)
+
 prob(m::LanguageModel, a...) = prob(m.estimator, m.seq, gram.(a)...)
 
 submodel(m::LanguageModel, x) =
     LanguageModel(m.bos, m.eos, submodel(m.seq, x), m.estimator)
 
-for f in (:gram_size, :order, :total)
-    @eval $f(m::LanguageModel, a...; kw...) = $f(m.seq, a...; kw...)
-end
+tokens(m::LanguageModel) = collect(keys(m.seq))
+
+total(m::LanguageModel) = total(m.seq)
 
 
 """
