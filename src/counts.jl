@@ -8,6 +8,15 @@ Base.count(c::NGramCounts, x) = total(submodel(c, x))
 Base.keys(c::NGramCounts) = keys(c.counts)
 Base.length(c::NGramCounts) = length(c.counts)
 
+function Base.merge(a::NGramCounts{N,T}, b::NGramCounts{N,T}) where {N,T}
+    c = deepcopy(a)
+    for k in keys(b)
+        c.counts[k] = merge(submodel(c, k), submodel(b, k))
+    end
+    c.total += b.total
+    return c
+end
+
 total(c::NGramCounts) = c.total
 
 gram_size(c::NGramCounts{N,T}) where {N,T} = N

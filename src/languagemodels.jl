@@ -26,6 +26,9 @@ function Base.count(m::LanguageModel, gram::Tuple)
     return total(m)
 end
 
+Base.merge(a::LanguageModel{N,T,P}, b::LanguageModel{N,T,P}) where {N,T,P} =
+    LanguageModel(a.bos, a.eos, merge(a.seq, b.seq), a.estimator)
+
 """
     NGrams.fit!(lm::LanguageModel, tokens)
 

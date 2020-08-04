@@ -144,6 +144,20 @@ using NGrams, Test
                 @test counts[token] / total ≈ 0.33 atol=0.02
             end
         end
+
+        @testset "Merging" begin
+            lm1 = NGrams.LanguageModel(3)
+            NGrams.fit!(lm1, ["this", "is", "good"])
+            @test NGrams.prob(lm1, "good") == 1/(3+1+1) # BOS EOS
+
+            lm2 = NGrams.LanguageModel(3)
+            NGrams.fit!(lm2, ["this", "is", "bad"])
+            @test NGrams.prob(lm2, "bad") == 1/(3+1+1) # BOS EOS
+
+            lm3 = merge(lm1, lm2)
+            @test NGrams.prob(lm3, "good") == 1/(6+2+2)
+            @test NGrams.prob(lm3, "bad") == 1/(6+2+2)
+        end
     end
 
 end
